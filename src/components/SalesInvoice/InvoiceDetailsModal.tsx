@@ -1,123 +1,152 @@
 "use client";
-import { useRef } from "react";
-import { Modal, Table, Text, Badge, Button, ActionIcon } from "@mantine/core";
-import { SalesInvoice } from "@/types/salesInvoice";
-import handlePrintInvoice from "../Common/invoicePrintTemp";
-import { MdLocalPrintshop } from "react-icons/md";
 
-type Props = {
+import { Modal, Table, ScrollArea, Badge } from "@mantine/core";
+import { SalesInvoice } from "@/types/salesInvoice";
+
+interface InvoiceDetailsModalProps {
   opened: boolean;
   onClose: () => void;
   invoice: SalesInvoice | null;
-};
+}
 
-export function InvoiceDetailsModal({ opened, onClose, invoice }: Props) {
-  const printRef = useRef<HTMLDivElement>(null);
-
+export function InvoiceDetailsModal({
+  opened,
+  onClose,
+  invoice,
+}: InvoiceDetailsModalProps) {
   if (!invoice) return null;
 
-  const numericStatus = Number(invoice.status);
   const statusTextMap: Record<number, string> = {
-    2: "مدفوع جزئي",
     1: "ذمم",
+    2: "مدفوع جزئي",
     3: "مدفوع",
+    4: "تسديد من الحساب",
+    5: "دفع وتسديد",
   };
 
+  const numericStatus = Number(invoice.status);
 
-
+  const formatCurrency = (amount: number | undefined) =>
+    (amount || 0).toLocaleString(undefined, {
+      style: "currency",
+      currency: "JOD",
+    });
 
   return (
     <Modal
-      dir="rtl"
       opened={opened}
       onClose={onClose}
-      title={`فاتورة رقم #${invoice.invoice_no}`}
+      title={`تفاصيل الفاتورة رقم ${invoice.invoice_no}`}
       size="lg"
-    >
-      <div ref={printRef}>
-        <div className="mb-4 flex flex-wrap justify-between items-center gap-4">
-          <Text fw="bold">اسم الزبون: {invoice.customer_name}</Text>
-          <Text fw="bold">
-            التاريخ: {new Date(invoice.invoice_date).toLocaleDateString()}
-          </Text>
-          <Badge
-            variant="light"
-            className="text-center"
-            color={
-              numericStatus === 3
-                ? "green"
-                : numericStatus === 2
-                  ? "yellow"
-                  : numericStatus === 1
-                    ? "red"
-                    : "gray"
-            }
-          >
-            {statusTextMap[numericStatus]}
-          </Badge>
-          <ActionIcon
-            radius="xl"
-            variant="light"
-            color="green"
-            onClick={() => handlePrintInvoice(invoice)}
-          >
-            <MdLocalPrintshop />
-          </ActionIcon>
-        </div>
-
-        <Table striped highlightOnHover>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>الصنف</Table.Th>
-              <Table.Th>الكمية</Table.Th>
-              <Table.Th>الوزن</Table.Th>
-              <Table.Th>السعر الافرادي</Table.Th>
-              <Table.Th>المجموع الاجمالي</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {invoice.items.map((item, i) => (
-              <Table.Tr key={i}>
-                <Table.Td>{item.name}</Table.Td>
-                <Table.Td>{item.qty}</Table.Td>
-                <Table.Td>{item.weight}</Table.Td>
-                <Table.Td>{item.unit_price}</Table.Td>
-                <Table.Td>
-                  {Number(item.price).toLocaleString(undefined, {
-                    style: "currency",
-                    currency: "JOD",
-                  })}
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
+      dir="rtl"
+       >
+      <ScrollArea style={{ maxHeight: "70vh" }}>
+        <Table striped highlightOnHover verticalSpacing="sm">
+          <tbody>
+            <tr>
+              <td>
+                <strong>رقم الفاتورة</strong>
+              </td>
+              <td>{invoice.invoice_no}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>الزبون</strong>
+              </td>
+              <td>{invoice.customer_name}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>التاريخ</strong>
+              </td>
+              <td>{new Date(invoice.invoice_date).toLocaleDateString()}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>الإجمالي الكلي</strong>
+              </td>
+              <td>{formatCurrency(invoice.grand_total)}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>نقداً</strong>
+              </td>
+              <td>{formatCurrency(invoice.cash_amount)}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>عملات معدنية</strong>
+              </td>
+              <td>{formatCurrency(invoice.coins_amount)}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>تحويل بنكي</strong>
+              </td>
+              <td>{formatCurrency(invoice.bank_transfer_amount)}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>أخرى</strong>
+              </td>
+              <td>{formatCurrency(invoice.other_amount)}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>المدفوع</strong>
+              </td>
+              <td>{formatCurrency(invoice.paid_amount)}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>المتبقي من الفاتورة</strong>
+              </td>
+              <td>{formatCurrency(invoice.remaining_invoice_amount)}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>المدفوع من الرصيد</strong>
+              </td>
+              <td>{formatCurrency(invoice.paid_from_previous_balance)}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>صافي الرصيد</strong>
+              </td>
+              <td>{formatCurrency(invoice.remaining_previous_balance)}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>الحالة</strong>
+              </td>
+              <td>
+                <Badge
+                  variant="light"
+                  color={
+                    numericStatus === 3
+                      ? "green"
+                      : numericStatus === 2
+                        ? "yellow"
+                        : numericStatus === 4
+                          ? "blue"
+                          : numericStatus === 5
+                            ? "teal"
+                            : "red"
+                  }
+                >
+                  {statusTextMap[numericStatus]}
+                </Badge>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>ملاحظات</strong>
+              </td>
+              <td>{invoice.notes || "-"}</td>
+            </tr>
+          </tbody>
         </Table>
-
-        <Text mt="md" fw="bold">
-          الإجمالي الكلي:{" "}
-          {invoice.grand_total.toLocaleString(undefined, {
-            style: "currency",
-            currency: "JOD",
-          })}
-        </Text>
-        <Text mt="md" fw="bold">
-          المدفوع:{" "}
-          {invoice.paid_amount.toLocaleString(undefined, {
-            style: "currency",
-            currency: "JOD",
-          })}
-        </Text>
-        <Text mt="md" fw="bold">
-          الباقي:{" "}
-          {invoice.remaining_amount.toLocaleString(undefined, {
-            style: "currency",
-            currency: "JOD",
-          })}
-        </Text>
-      </div>
-
-
-
+      </ScrollArea>
     </Modal>
   );
 }

@@ -159,8 +159,15 @@ export const NAV_DATA: NavSection[] = [
             items: [],
           },
           {
-            title: "العملاء",
+            title: "الزبائن",
             url: "/dashboard/customers",
+            icon: HiOutlineUsers,
+
+            items: [],
+          },
+          {
+            title: "ذمم الزبائن",
+            url: "/dashboard/customer-balances",
             icon: HiOutlineUsers,
 
             items: [],

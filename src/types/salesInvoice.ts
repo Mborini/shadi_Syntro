@@ -13,6 +13,14 @@ export interface SalesInvoice {
   created_at?: string;
   updated_at?: string;
   item_name?: string; // اسم الصنف للعرض فقط
+  cash_amount?: number;
+  coins_amount?: number;
+  bank_transfer_amount?: number;
+  other_amount?: number;
+  paid_from_previous_balance?: number;
+  remaining_previous_balance?: number;
+  notes?: string;
+  remaining_invoice_amount?: number;
 }
 
 
@@ -32,18 +40,20 @@ export interface SalesInvoiceItem {
 
 // DTO لإنشاء فاتورة جديدة
 export interface CreateSalesInvoiceDTO {
+  invoice_no: string;
   customer_id: number;
   invoice_date: string;
-  items: {
-    item_id: number;
-    qty: number;
-    unit_price: number;
-    price: number;
-    weight?: number;
-  }[];
+  
+  remaining_invoice_amount: number;
+  totalBalance: number;
+  cash_amount?: number;
+  coins_amount?: number;
+  bank_transfer_amount?: number;
+  other_amount?: number;
+  notes?: string;
   grand_total: number;
   paid_amount: number;
-  remaining_amount: number;
+  remaining_amount?: number;
   status: number;
 }
 

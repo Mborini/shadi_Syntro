@@ -9,7 +9,6 @@ type Props = {
   onFilter: (filters: {
     invoiceNo: string;
     customer: string;
-    itemName: string;
     startDate: string;
     endDate: string;
     status: string; // حالة الفاتورة
@@ -19,11 +18,12 @@ type Props = {
 export function InvoiceFilter({ onFilter }: Props) {
   const [invoiceNo, setInvoiceNo] = useState("");
   const [customer, setCustomer] = useState("");
-  const [itemName, setItemName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState("");
-  const [customers, setCustomers] = useState<{ id: number; name: string }[]>([]);
+  const [customers, setCustomers] = useState<{ id: number; name: string }[]>(
+    [],
+  );
 
   // تحديد الشهر الحالي افتراضيًا
   useEffect(() => {
@@ -49,8 +49,8 @@ export function InvoiceFilter({ onFilter }: Props) {
   }, []);
 
   useEffect(() => {
-    onFilter({ invoiceNo, customer, itemName, startDate, endDate, status });
-  }, [invoiceNo, customer, itemName, startDate, endDate, status]);
+    onFilter({ invoiceNo, customer, startDate, endDate, status });
+  }, [invoiceNo, customer, startDate, endDate, status]);
 
   return (
     <Group mt={-24} dir="rtl">
@@ -61,20 +61,10 @@ export function InvoiceFilter({ onFilter }: Props) {
         onChange={(e) => setInvoiceNo(e.currentTarget.value)}
         size="xs"
       />
-      
-     
-      <TextInput
-        label="اسم الصنف"
-        radius="md"
-        value={itemName}
-        onChange={(e) => setItemName(e.currentTarget.value)}
-        size="xs"
-      />
 
       <Group gap={1} dir="rtl">
         <TextInput
-        label="من"
-        
+          label="من"
           radius="md"
           type="date"
           value={startDate}
@@ -85,7 +75,7 @@ export function InvoiceFilter({ onFilter }: Props) {
 
       <Group gap={1} dir="rtl">
         <TextInput
-        label="إلى"        
+          label="إلى"
           radius="md"
           type="date"
           value={endDate}
@@ -93,11 +83,10 @@ export function InvoiceFilter({ onFilter }: Props) {
           size="xs"
         />
       </Group>
- <Select
-      label="الزبون"
-      dir="rtl"
+      <Select
+        label="الزبون"
+        dir="rtl"
         radius="md"
-
         value={customer}
         onChange={(val) => setCustomer(val || "")}
         size="xs"
@@ -119,6 +108,7 @@ export function InvoiceFilter({ onFilter }: Props) {
           { value: "1", label: "ذمم" },
           { value: "2", label: "مدفوع جزئي" },
           { value: "3", label: "مدفوع" },
+          { value: "4", label: "تسديد من الحساب" },
         ]}
       />
     </Group>
